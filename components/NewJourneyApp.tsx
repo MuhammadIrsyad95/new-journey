@@ -376,11 +376,11 @@ function Sidebar({ page, setPage, mobileOpen, setMobileOpen }: { page: string; s
   return (
     <>
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-black/30 lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
       <aside
-        className={`fixed z-50 flex h-screen w-64 flex-col border-r border-[#E3DFD3] bg-[#FFFEFB] transition-transform lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
-          } lg:static lg:z-auto`}
+        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-[82vw] max-w-80 flex-col border-r border-[#E3DFD3] bg-[#FFFEFB] shadow-2xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-64 lg:max-w-none lg:translate-x-0 lg:shadow-none ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          } overflow-y-auto`}
       >
         <div className="flex items-center gap-2.5 px-6 py-6">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0F4C3A] text-white">
@@ -431,17 +431,17 @@ function Sidebar({ page, setPage, mobileOpen, setMobileOpen }: { page: string; s
 
 function Topbar({ title, subtitle, setMobileOpen }: { title: string; subtitle?: string; setMobileOpen: PageSetter }) {
   return (
-    <div className="mb-7 flex items-center justify-between gap-4">
+    <div className="mb-5 flex items-center justify-between gap-3 sm:mb-7 sm:gap-4">
       <div className="flex items-center gap-3">
-        <button className="rounded-lg p-2 text-[#5B5446] hover:bg-[#EFEBE3] lg:hidden" onClick={() => setMobileOpen(true)}>
+        <button aria-label="Open navigation menu" className="rounded-lg p-2.5 text-[#5B5446] hover:bg-[#EFEBE3] lg:hidden" onClick={() => setMobileOpen(true)}>
           <Menu size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>{title}</h1>
-          {subtitle && <p className="mt-0.5 text-sm text-[#5B5446]">{subtitle}</p>}
+          <h1 className="text-xl font-semibold text-[#15231C] sm:text-2xl" style={{ fontFamily: "Outfit, sans-serif" }}>{title}</h1>
+          {subtitle && <p className="mt-0.5 text-xs text-[#5B5446] sm:text-sm">{subtitle}</p>}
         </div>
       </div>
-      <div className="flex items-center gap-2.5">
+      <div className="hidden items-center gap-2.5 sm:flex">
         <button className="hidden rounded-xl border border-[#E3DFD3] bg-white p-2.5 text-[#5B5446] hover:bg-[#FAF8F4] sm:flex">
           <Bell size={17} />
         </button>
@@ -495,7 +495,7 @@ function DashboardPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
       <Topbar title="Dashboard" subtitle="Ringkasan keuangan keluarga, Juni 2026" setMobileOpen={setMobileOpen} />
 
       {/* Summary grid */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
         <SummaryCard label="Saldo Saat Ini" value={fmtIDR(balance)} icon={Wallet} tone="forest" trend={4.2} sub="Gabungan semua akun" />
         <SummaryCard label="Total Pemasukan" value={fmtIDR(totalIncome)} icon={ArrowUpCircle} tone="light" trend={2.6} sub="Bulan ini" />
         <SummaryCard label="Total Pengeluaran" value={fmtIDR(totalExpense)} icon={ArrowDownCircle} tone="light" trend={-8.1} sub="Bulan ini" />
@@ -504,9 +504,9 @@ function DashboardPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
         <SummaryCard label="Perjalanan Aktif" value="Liburan Keluarga" icon={Compass} tone="light" sub="Milestone ke-4 dari 5" />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
         {/* Monthly expense chart */}
-        <GlassCard className="col-span-1 p-5 lg:col-span-2">
+        <GlassCard className="col-span-1 p-4 sm:p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Tren Pemasukan & Pengeluaran</h3>
@@ -514,43 +514,47 @@ function DashboardPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
             </div>
             <Pill tone="good">+ Surplus stabil</Pill>
           </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart data={monthlyTrend}>
-              <defs>
-                <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0F4C3A" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#0F4C3A" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#C99A4B" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#C99A4B" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8C8579" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
-              <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
-              <Area type="monotone" dataKey="income" stroke="#0F4C3A" strokeWidth={2.5} fill="url(#incomeGrad)" name="Pemasukan" />
-              <Area type="monotone" dataKey="expense" stroke="#C99A4B" strokeWidth={2.5} fill="url(#expenseGrad)" name="Pengeluaran" />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="h-56 w-full sm:h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={monthlyTrend}>
+                <defs>
+                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#0F4C3A" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#0F4C3A" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#C99A4B" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#C99A4B" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8C8579" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
+                <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
+                <Area type="monotone" dataKey="income" stroke="#0F4C3A" strokeWidth={2.5} fill="url(#incomeGrad)" name="Pemasukan" />
+                <Area type="monotone" dataKey="expense" stroke="#C99A4B" strokeWidth={2.5} fill="url(#expenseGrad)" name="Pengeluaran" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </GlassCard>
 
         {/* Expense categories pie */}
-        <GlassCard className="p-5">
+        <GlassCard className="p-4 sm:p-5">
           <h3 className="mb-1 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Kategori Pengeluaran</h3>
           <p className="mb-4 text-xs text-[#8C8579]">Distribusi bulan ini</p>
-          <ResponsiveContainer width="100%" height={190}>
-            <PieChart>
-              <Pie data={expenseByCategory} dataKey="value" nameKey="name" innerRadius={50} outerRadius={75} paddingAngle={2}>
-                {expenseByCategory.map((e) => (
-                  <Cell key={e.name} fill={CATEGORY_META[e.name]?.color || "#8C8579"} />
-                ))}
-              </Pie>
-              <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5">
+          <div className="h-52 w-full sm:h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={expenseByCategory} dataKey="value" nameKey="name" innerRadius={50} outerRadius={75} paddingAngle={2}>
+                  {expenseByCategory.map((e) => (
+                    <Cell key={e.name} fill={CATEGORY_META[e.name]?.color || "#8C8579"} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
             {expenseByCategory.slice(0, 6).map((e) => (
               <div key={e.name} className="flex items-center gap-1.5 text-xs text-[#5B5446]">
                 <span className="h-2 w-2 rounded-full" style={{ background: CATEGORY_META[e.name]?.color }} />
@@ -561,9 +565,9 @@ function DashboardPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
         </GlassCard>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
         {/* Recent transactions */}
-        <GlassCard className="col-span-1 p-5 lg:col-span-2">
+        <GlassCard className="col-span-1 p-4 sm:p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Transaksi Terbaru</h3>
             <button className="text-sm font-medium text-[#0F4C3A] hover:underline">Lihat semua</button>
@@ -592,8 +596,8 @@ function DashboardPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
         </GlassCard>
 
         {/* Quick actions + budget progress */}
-        <div className="flex flex-col gap-5">
-          <GlassCard className="p-5">
+        <div className="flex flex-col gap-4 sm:gap-5">
+          <GlassCard className="p-4 sm:p-5">
             <h3 className="mb-4 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Aksi Cepat</h3>
             <div className="space-y-2.5">
               <PrimaryButton className="w-full" icon={Plus}>Tambah Pemasukan</PrimaryButton>
@@ -602,7 +606,7 @@ function DashboardPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
             </div>
           </GlassCard>
 
-          <GlassCard className="p-5">
+          <GlassCard className="p-4 sm:p-5">
             <h3 className="mb-4 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Progres Anggaran</h3>
             <div className="space-y-4">
               {budgets.slice(0, 3).map((b) => {
@@ -642,7 +646,7 @@ function IncomePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
     <div>
       <Topbar title="Pemasukan" subtitle="Catat dan pantau seluruh sumber pemasukan keluarga" setMobileOpen={setMobileOpen} />
 
-      <GlassCard className="p-5">
+      <GlassCard className="p-4 sm:p-5">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:w-72">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A192]" />
@@ -653,10 +657,10 @@ function IncomePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
               className={inputCls + " pl-10"}
             />
           </div>
-          <PrimaryButton icon={Plus} onClick={() => setModalOpen(true)}>Tambah Pemasukan</PrimaryButton>
+          <PrimaryButton icon={Plus} onClick={() => setModalOpen(true)} className="w-full sm:w-auto">Tambah Pemasukan</PrimaryButton>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#E3DFD3] text-xs uppercase tracking-wide text-[#8C8579]">
@@ -689,6 +693,26 @@ function IncomePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
             </tbody>
           </table>
         </div>
+
+        <div className="space-y-3 sm:hidden">
+          {filtered.map((row) => (
+            <div key={row.id} className="rounded-2xl border border-[#E3DFD3] bg-white p-4 shadow-[0_2px_12px_-10px_rgba(15,76,58,0.25)]">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E7F0E5] text-[#2C5E3F]">
+                    <ArrowUpCircle size={15} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-[#15231C]">{row.source}</p>
+                    <p className="mt-0.5 text-xs text-[#8C8579]">{row.date}</p>
+                  </div>
+                </div>
+                <p className="shrink-0 text-sm font-semibold text-[#2C5E3F]">+{fmtIDR(row.amount)}</p>
+              </div>
+              <p className="mt-3 line-clamp-2 text-xs text-[#5B5446]">{row.notes}</p>
+            </div>
+          ))}
+        </div>
       </GlassCard>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Tambah Pemasukan">
@@ -696,9 +720,9 @@ function IncomePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
         <Field label="Jumlah"><input className={inputCls} placeholder="Rp0" /></Field>
         <Field label="Tanggal"><input type="date" className={inputCls} /></Field>
         <Field label="Catatan"><textarea className={inputCls} rows={3} placeholder="Tambahkan catatan (opsional)" /></Field>
-        <div className="mt-2 flex gap-3">
-          <GhostButton className="flex-1" onClick={() => setModalOpen(false)}>Batal</GhostButton>
-          <PrimaryButton className="flex-1" onClick={() => setModalOpen(false)}>Simpan Pemasukan</PrimaryButton>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+          <GhostButton className="w-full flex-1" onClick={() => setModalOpen(false)}>Batal</GhostButton>
+          <PrimaryButton className="w-full flex-1" onClick={() => setModalOpen(false)}>Simpan Pemasukan</PrimaryButton>
         </div>
       </Modal>
     </div>
@@ -724,7 +748,7 @@ function ExpensePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
     <div>
       <Topbar title="Pengeluaran" subtitle="Lacak semua pengeluaran rumah tangga secara rinci" setMobileOpen={setMobileOpen} />
 
-      <GlassCard className="p-5">
+      <GlassCard className="p-4 sm:p-5">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-64">
@@ -754,7 +778,7 @@ function ExpensePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
           <PrimaryButton icon={Plus} onClick={() => setModalOpen(true)} className="w-full sm:w-auto">Tambah Pengeluaran</PrimaryButton>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#E3DFD3] text-xs uppercase tracking-wide text-[#8C8579]">
@@ -790,6 +814,30 @@ function ExpensePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
             </tbody>
           </table>
         </div>
+
+        <div className="space-y-3 sm:hidden">
+          {filtered.map((row) => {
+            const meta = CATEGORY_META[row.category];
+            const Icon = meta?.icon || Package;
+            return (
+              <div key={row.id} className="rounded-2xl border border-[#E3DFD3] bg-white p-4 shadow-[0_2px_12px_-10px_rgba(15,76,58,0.25)]">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-[#15231C]">{row.desc}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: `${meta?.color}1A`, color: meta?.color }}>
+                        <Icon size={12} /> {row.category}
+                      </span>
+                      <span className="inline-flex items-center rounded-full bg-[#EFEBE3] px-2.5 py-1 text-xs font-medium text-[#5B5446]">{row.method}</span>
+                    </div>
+                  </div>
+                  <p className="shrink-0 text-sm font-semibold text-[#15231C]">-{fmtIDR(row.amount)}</p>
+                </div>
+                <div className="mt-3 text-xs text-[#8C8579]">{row.date}</div>
+              </div>
+            );
+          })}
+        </div>
       </GlassCard>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Tambah Pengeluaran">
@@ -806,9 +854,9 @@ function ExpensePage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
         </Field>
         <Field label="Tanggal"><input type="date" className={inputCls} /></Field>
         <Field label="Catatan"><textarea className={inputCls} rows={3} placeholder="Tambahkan catatan (opsional)" /></Field>
-        <div className="mt-2 flex gap-3">
-          <GhostButton className="flex-1" onClick={() => setModalOpen(false)}>Batal</GhostButton>
-          <PrimaryButton className="flex-1" onClick={() => setModalOpen(false)}>Simpan Pengeluaran</PrimaryButton>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+          <GhostButton className="w-full flex-1" onClick={() => setModalOpen(false)}>Batal</GhostButton>
+          <PrimaryButton className="w-full flex-1" onClick={() => setModalOpen(false)}>Simpan Pengeluaran</PrimaryButton>
         </div>
       </Modal>
     </div>
@@ -920,57 +968,63 @@ function AnalyticsPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
     <div>
       <Topbar title="Analitik" subtitle="Pahami pola pengeluaran keluarga lebih dalam" setMobileOpen={setMobileOpen} />
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <GlassCard className="p-5">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2">
+        <GlassCard className="p-4 sm:p-5">
           <h3 className="mb-1 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Distribusi Kategori</h3>
           <p className="mb-4 text-xs text-[#8C8579]">Persentase pengeluaran bulan ini</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={expenseByCategory} dataKey="value" nameKey="name" innerRadius={60} outerRadius={95} paddingAngle={2}>
-                {expenseByCategory.map((e) => (
-                  <Cell key={e.name} fill={CATEGORY_META[e.name]?.color || "#8C8579"} />
-                ))}
-              </Pie>
-              <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="h-60 w-full sm:h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={expenseByCategory} dataKey="value" nameKey="name" innerRadius={60} outerRadius={95} paddingAngle={2}>
+                  {expenseByCategory.map((e) => (
+                    <Cell key={e.name} fill={CATEGORY_META[e.name]?.color || "#8C8579"} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </GlassCard>
 
-        <GlassCard className="p-5">
+        <GlassCard className="p-4 sm:p-5">
           <h3 className="mb-1 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Perbandingan Kategori</h3>
           <p className="mb-4 text-xs text-[#8C8579]">Jumlah pengeluaran per kategori</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={barData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#8C8579" }} axisLine={false} tickLine={false} interval={0} angle={-25} textAnchor="end" height={60} />
-              <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
-              <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                {barData.map((e) => (
-                  <Cell key={e.name} fill={CATEGORY_META[e.name]?.color || "#8C8579"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-60 w-full sm:h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#8C8579" }} axisLine={false} tickLine={false} interval={0} angle={-25} textAnchor="end" height={60} />
+                <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
+                <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                  {barData.map((e) => (
+                    <Cell key={e.name} fill={CATEGORY_META[e.name]?.color || "#8C8579"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </GlassCard>
       </div>
 
-      <GlassCard className="mt-5 p-5">
+      <GlassCard className="mt-5 p-4 sm:p-5">
         <h3 className="mb-1 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Tren Bulanan</h3>
         <p className="mb-4 text-xs text-[#8C8579]">Pemasukan vs pengeluaran, 6 bulan terakhir</p>
-        <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={monthlyTrend}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8C8579" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
-            <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
-            <Line type="monotone" dataKey="income" stroke="#0F4C3A" strokeWidth={2.5} dot={{ r: 3 }} name="Pemasukan" />
-            <Line type="monotone" dataKey="expense" stroke="#C99A4B" strokeWidth={2.5} dot={{ r: 3 }} name="Pengeluaran" />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="h-60 w-full sm:h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={monthlyTrend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8C8579" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
+              <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
+              <Line type="monotone" dataKey="income" stroke="#0F4C3A" strokeWidth={2.5} dot={{ r: 3 }} name="Pemasukan" />
+              <Line type="monotone" dataKey="expense" stroke="#C99A4B" strokeWidth={2.5} dot={{ r: 3 }} name="Pengeluaran" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </GlassCard>
 
-      <GlassCard className="mt-5 p-5">
+      <GlassCard className="mt-5 p-4 sm:p-5">
         <h3 className="mb-4 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Kategori Pengeluaran Teratas</h3>
         <div className="space-y-3">
           {topCategories.map((c, i) => {
@@ -1014,7 +1068,7 @@ function InsightPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
       <Topbar title="AI Financial Insight" subtitle="Wawasan otomatis dari kebiasaan keuangan keluargamu" setMobileOpen={setMobileOpen} />
 
       <GlassCard className="mb-6 overflow-hidden p-0">
-        <div style={{ background: `linear-gradient(135deg, ${COLORS.forest}, ${COLORS.forestDeep})` }} className="flex flex-col gap-4 p-6 text-white sm:flex-row sm:items-center sm:justify-between">
+        <div style={{ background: `linear-gradient(135deg, ${COLORS.forest}, ${COLORS.forestDeep})` }} className="flex flex-col gap-4 p-5 text-white sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
               <Sparkles size={22} />
@@ -1045,23 +1099,25 @@ function InsightPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
         })}
       </div>
 
-      <GlassCard className="mt-5 p-5">
+      <GlassCard className="mt-5 p-4 sm:p-5">
         <h3 className="mb-4 font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Estimasi Saldo Akhir Bulan</h3>
-        <ResponsiveContainer width="100%" height={180}>
-          <AreaChart data={monthlyTrend.map((m) => ({ month: m.month, projected: m.income - m.expense }))}>
-            <defs>
-              <linearGradient id="projGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#C99A4B" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#C99A4B" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8C8579" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
-            <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
-            <Area type="monotone" dataKey="projected" stroke="#C99A4B" strokeWidth={2.5} fill="url(#projGrad)" name="Surplus" />
-          </AreaChart>
-        </ResponsiveContainer>
+        <div className="h-48 w-full sm:h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={monthlyTrend.map((m) => ({ month: m.month, projected: m.income - m.expense }))}>
+              <defs>
+                <linearGradient id="projGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#C99A4B" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#C99A4B" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E3DFD3" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8C8579" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#8C8579" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}jt`} />
+              <Tooltip formatter={tooltipFormatter} contentStyle={{ borderRadius: 12, border: "1px solid #E3DFD3" }} />
+              <Area type="monotone" dataKey="projected" stroke="#C99A4B" strokeWidth={2.5} fill="url(#projGrad)" name="Surplus" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </GlassCard>
     </div>
   );
@@ -1076,23 +1132,23 @@ function ReportsPage({ setMobileOpen }: { setMobileOpen: PageSetter }) {
     <div>
       <Topbar title="Laporan" subtitle="Unduh laporan keuangan bulanan keluarga" setMobileOpen={setMobileOpen} />
 
-      <GlassCard className="mb-6 p-6">
-        <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+      <GlassCard className="mb-6 p-4 sm:p-6">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center sm:gap-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[#8C8579]">Laporan Bulanan</p>
             <h3 className="mt-1 text-xl font-semibold text-[#15231C]" style={{ fontFamily: "Outfit, sans-serif" }}>Juni 2026</h3>
             <p className="mt-1 text-sm text-[#5B5446]">Pemasukan Rp19.000.000 · Pengeluaran Rp12.420.000 · Surplus Rp6.580.000</p>
           </div>
-          <div className="flex gap-3">
-            <GhostButton icon={Download}>Unduh Excel</GhostButton>
-            <PrimaryButton icon={Download}>Unduh PDF</PrimaryButton>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <GhostButton className="w-full sm:w-auto" icon={Download}>Unduh Excel</GhostButton>
+            <PrimaryButton className="w-full sm:w-auto" icon={Download}>Unduh PDF</PrimaryButton>
           </div>
         </div>
       </GlassCard>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {["April 2026", "Mei 2026", "Juni 2026"].map((m, i) => (
-          <GlassCard key={m} className="p-5">
+          <GlassCard key={m} className="p-4 sm:p-5">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EFEBE3] text-[#5B5446]">
                 <FileText size={16} />
